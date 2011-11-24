@@ -12,7 +12,7 @@ Description: Adds a 'Portfolio' post type and shortcodes
 Version: 0.0.1
 Author URI: http://bigmikestudios.com
 
-Here is an edit done locally to test github.
+Here is an edit to test how this works on github.
 */
 
 $cr = "\r\n";
