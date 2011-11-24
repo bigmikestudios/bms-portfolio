@@ -11,6 +11,8 @@ Depends: bms_smart_meta_box/bms_smart_meta_box.php
 Description: Adds a 'Portfolio' post type and shortcodes
 Version: 0.0.1
 Author URI: http://bigmikestudios.com
+
+Here is an edit done locally to test github.
 */
 
 $cr = "\r\n";
