@@ -11,8 +11,6 @@ Depends: bms_smart_meta_box/bms_smart_meta_box.php
 Description: Adds a 'Portfolio' post type and shortcodes
 Version: 0.0.1
 Author URI: http://bigmikestudios.com
-
-Here is an edit to test how this works on github.
 */
 
 $cr = "\r\n";
@@ -56,8 +54,8 @@ wp_enqueue_style('bms_portfolio');
     $args = array(
     'labels' => $labels,
     'hierarchical' => false,
-    'supports' => array( 'title', 'editor' ),
-    'taxonomies' => array( 'category', 'post_tag' ),
+    'supports' => array( 'title', 'editor', 'custom-fields' ),
+    'taxonomies' => array( 'portfolio_category' ),
     'public' => true,
     'show_ui' => true,
     'show_in_menu' => true,
@@ -72,6 +70,43 @@ wp_enqueue_style('bms_portfolio');
     );
     register_post_type( 'portfolio', $args );
     } 
+	
+	add_action( 'init', 'register_taxonomy_portfolio_category' );
+
+function register_taxonomy_portfolio_category() {
+
+    $labels = array( 
+        'name' => _x( 'Portfolio Categories', 'portfolio category' ),
+        'singular_name' => _x( 'Portfolio Category', 'portfolio category' ),
+        'search_items' => _x( 'Search Portfolio Categories', 'portfolio category' ),
+        'popular_items' => _x( 'Popular Portfolio Categories', 'portfolio category' ),
+        'all_items' => _x( 'All Portfolio Categories', 'portfolio category' ),
+        'parent_item' => _x( 'Parent Portfolio Category', 'portfolio category' ),
+        'parent_item_colon' => _x( 'Parent Portfolio Category:', 'portfolio category' ),
+        'edit_item' => _x( 'Edit Portfolio Category', 'portfolio category' ),
+        'update_item' => _x( 'Update Portfolio Category', 'portfolio category' ),
+        'add_new_item' => _x( 'Add New Portfolio Category', 'portfolio category' ),
+        'new_item_name' => _x( 'New Portfolio Category Name', 'portfolio category' ),
+        'separate_items_with_commas' => _x( 'Separate portfolio categories with commas', 'portfolio category' ),
+        'add_or_remove_items' => _x( 'Add or remove portfolio categories', 'portfolio category' ),
+        'choose_from_most_used' => _x( 'Choose from the most used portfolio categories', 'portfolio category' ),
+        'menu_name' => _x( 'Portfolio Categories', 'portfolio category' ),
+    );
+
+    $args = array( 
+        'labels' => $labels,
+        'public' => true,
+        'show_in_nav_menus' => true,
+        'show_ui' => true,
+        'show_tagcloud' => true,
+        'hierarchical' => true,
+
+        'rewrite' => true,
+        'query_var' => true
+    );
+
+    register_taxonomy( 'portfolio_category', array('portfolio'), $args );
+}
 
 // =============================================================================
 
@@ -86,20 +121,77 @@ if (is_admin()) {
 		require_once("../wp-content/plugins/bms_smart_meta_box/SmartMetaBox.php");
 	}
 	
+	$fields = array();
+	$image_fields_number = 3; // increase to add more
+
+  	$fields[] = array(
+				'name' => 'URL',
+				'id' => 'bms_portfolio_url',
+				'default' => '',
+				'desc' => "Add a url for this project Include 'http://'",
+				'type' => 'text',
+	);
+	
+	$fields[] = array(
+				'name' => 'People',
+				'id' => 'bms_portfolio_people',
+				'default' => '',
+				'desc' => 'Add people involved in this project',
+				'type' => 'relationship',
+				'post_type' => 'person'
+	);
+			
+	for ($i = 0; $i < $image_fields_number; $i++) {
+		$num = $i + 1;
+		$fields[] = array (
+			'name' => "<strong>IMAGE $num</strong>",
+			'content' => "<div style='width: 100%; border-bottom: 1px solid grey'> </div>",
+			'type' => 'display',
+			'desc' => " ",
+		);
+		$fields[] = array (
+			'name' => "Title",
+			'id' => "bms_portfolio_image$num_title",
+			'default' => '',
+			'desc' => "Add a title for Image $num.",
+			'type' => 'Text',
+		);
+		$fields[] = array (
+			'name' => "Image File",
+			'id' => "bms_portfolio_image$num",
+			'default' => '',
+			'desc' => 'Add an image.',
+			'type' => 'file',
+		);
+		$fields[] = array (
+			'name' => "URL",
+			'id' => "bms_portfolio_image$num_url",
+			'default' => '',
+			'desc' => "Add a url for Image $num. Include 'http://'",
+			'type' => 'Text',
+		);
+		$fields[] = array (
+			'name' => "Description",
+			'id' => "bms_portfolio_image$num_desc",
+			'default' => '',
+			'desc' => "Add a description for Image $num.",
+			'type' => 'textarea',
+		);
+	}
+	$fields[] = array (
+			'name' => "<strong> </strong>",
+			'content' => "<div style='width: 100%; border-bottom: 1px solid grey'> </div>",
+			'type' => 'display',
+			'desc' => " ",
+	);
+
+	
 	new SmartMetaBox('smart_meta_box_portfolio', array(
 		'title'     => 'BMS Portfolio',
 		'pages'     => array('portfolio'),
 		'context'   => 'normal',
 		'priority'  => 'high',
-		'fields'    => array(
-			array(
-				'name' => 'Image',
-				'id' => 'bms_portfolio_image',
-				'default' => '',
-				'desc' => 'Add an image.',
-				'type' => 'file',
-			),
-		)
+		'fields'    => $fields
 	));
 }
 	
