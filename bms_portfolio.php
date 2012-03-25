@@ -272,4 +272,4 @@ function bms_portfolio_the_content ($c) {
 		return $c;
 	}
 }
-add_filter('the_content', 'bms_portfolio_the_content');
+// add_filter('the_content', 'bms_portfolio_the_content');
