@@ -86,26 +86,26 @@ function bms_portfolio_add_post_thumbnails() {
 //
 //////////////////////////
 
-add_action( 'init', 'register_taxonomy_portfolio_category' );
+add_action( 'init', 'register_taxonomy_media' );
 
-function register_taxonomy_portfolio_category() {
+function register_taxonomy_media() {
 
     $labels = array( 
-        'name' => _x( 'Portfolio Categories', 'portfolio category' ),
-        'singular_name' => _x( 'Portfolio Category', 'portfolio category' ),
-        'search_items' => _x( 'Search Portfolio Categories', 'portfolio category' ),
-        'popular_items' => _x( 'Popular Portfolio Categories', 'portfolio category' ),
-        'all_items' => _x( 'All Portfolio Categories', 'portfolio category' ),
-        'parent_item' => _x( 'Parent Portfolio Category', 'portfolio category' ),
-        'parent_item_colon' => _x( 'Parent Portfolio Category:', 'portfolio category' ),
-        'edit_item' => _x( 'Edit Portfolio Category', 'portfolio category' ),
-        'update_item' => _x( 'Update Portfolio Category', 'portfolio category' ),
-        'add_new_item' => _x( 'Add New Portfolio Category', 'portfolio category' ),
-        'new_item_name' => _x( 'New Portfolio Category Name', 'portfolio category' ),
-        'separate_items_with_commas' => _x( 'Separate portfolio categories with commas', 'portfolio category' ),
-        'add_or_remove_items' => _x( 'Add or remove portfolio categories', 'portfolio category' ),
-        'choose_from_most_used' => _x( 'Choose from the most used portfolio categories', 'portfolio category' ),
-        'menu_name' => _x( 'Portfolio Categories', 'portfolio category' ),
+        'name' => _x( 'Media', 'media' ),
+        'singular_name' => _x( 'Medium', 'media' ),
+        'search_items' => _x( 'Search Media', 'media' ),
+        'popular_items' => _x( 'Popular Media', 'media' ),
+        'all_items' => _x( 'All Media', 'media' ),
+        'parent_item' => _x( 'Parent Medium', 'media' ),
+        'parent_item_colon' => _x( 'Parent Medium:', 'media' ),
+        'edit_item' => _x( 'Edit Medium', 'media' ),
+        'update_item' => _x( 'Update Medium', 'media' ),
+        'add_new_item' => _x( 'Add New Medium', 'media' ),
+        'new_item_name' => _x( 'New Medium', 'media' ),
+        'separate_items_with_commas' => _x( 'Separate media with commas', 'media' ),
+        'add_or_remove_items' => _x( 'Add or remove media', 'media' ),
+        'choose_from_most_used' => _x( 'Choose from the most used media', 'media' ),
+        'menu_name' => _x( 'Media', 'media' ),
     );
 
     $args = array( 
@@ -120,8 +120,10 @@ function register_taxonomy_portfolio_category() {
         'query_var' => true
     );
 
-    register_taxonomy( 'portfolio_category', array('portfolio'), $args );
+    register_taxonomy( 'media', array('portfolio'), $args );
 }
+
+//////////////////////////
 
 add_action( 'init', 'register_taxonomy_service' );
 
@@ -151,7 +153,7 @@ function register_taxonomy_service() {
         'show_in_nav_menus' => true,
         'show_ui' => true,
         'show_tagcloud' => true,
-        'hierarchical' => false,
+        'hierarchical' => true,
 
         'rewrite' => true,
         'query_var' => true
@@ -240,36 +242,4 @@ function bms_portfolio_listing($atts, $content=null) {
 
 add_shortcode('bms_portfolio_listing', 'bms_portfolio_listing');
 
-
-// =============================================================================
-
-
-// SINGLE ENTRY
-
-function bms_portfolio_the_content ($c) {
-	global $post;
-	
-	if ($post->post_type == "portfolio") {
-		$img = get_post_meta($post->ID, '_smartmeta_bms_portfolio_image', true);
-		$img = wp_get_attachment_image_src( $img, '600x9999');
-		$img_src	=$img[0];
-		$img_width	=$img[1];
-		$img_height	=$img[2];	
-		
-		ob_start();
-		?>
-		<!-- the_content start -->
-		<img src='$img_src' width='$img_width' height='$img_height' class='$img_class' alt='image' />
-		<?php echo wpautop($post->post_content); ?>
-		<!-- the_content end -->
-		<?php
-		$return_multiple = ob_get_clean(); 
-		
-		$return = (is_single()) ? "single" : $return_multiple;
-		
-		return $return;
-	} else {
-		return $c;
-	}
-}
-// add_filter('the_content', 'bms_portfolio_the_content');
+?>
