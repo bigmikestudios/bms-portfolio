@@ -19,18 +19,6 @@ $cr = "\r\n";
 
 //////////////////////////
 //
-// INCLUDES
-//
-//////////////////////////
-
-wp_register_style('bms_portfolio', plugins_url() .'/bms_portfolio/bms_portfolio.css');
-wp_enqueue_style('bms_portfolio');
-
-
-// =============================================================================
-
-//////////////////////////
-//
 // CUSTOM POST TYPES
 //
 //////////////////////////
@@ -39,7 +27,7 @@ add_action( 'init', 'register_cpt_portfolio' );
 function register_cpt_portfolio() {
   $labels = array(
 	  'name' => _x( 'Portfolio Items', 'portfolio' ),
-	  'singular_name' => _x( 'Item', 'portfolio' ),
+	  'singular_name' => _x( 'Portfolio Item', 'portfolio' ),
 	  'add_new' => _x( 'Add New', 'portfolio' ),
 	  'add_new_item' => _x( 'Add New Item', 'portfolio' ),
 	  'edit_item' => _x( 'Edit Item', 'portfolio' ),
@@ -78,89 +66,6 @@ function bms_portfolio_add_post_thumbnails() {
 }
 
 
-// =============================================================================
-
-//////////////////////////
-//
-// CUSTOM TAXONOMIES
-//
-//////////////////////////
-
-add_action( 'init', 'register_taxonomy_media' );
-
-function register_taxonomy_media() {
-
-    $labels = array( 
-        'name' => _x( 'Media', 'media' ),
-        'singular_name' => _x( 'Medium', 'media' ),
-        'search_items' => _x( 'Search Media', 'media' ),
-        'popular_items' => _x( 'Popular Media', 'media' ),
-        'all_items' => _x( 'All Media', 'media' ),
-        'parent_item' => _x( 'Parent Medium', 'media' ),
-        'parent_item_colon' => _x( 'Parent Medium:', 'media' ),
-        'edit_item' => _x( 'Edit Medium', 'media' ),
-        'update_item' => _x( 'Update Medium', 'media' ),
-        'add_new_item' => _x( 'Add New Medium', 'media' ),
-        'new_item_name' => _x( 'New Medium', 'media' ),
-        'separate_items_with_commas' => _x( 'Separate media with commas', 'media' ),
-        'add_or_remove_items' => _x( 'Add or remove media', 'media' ),
-        'choose_from_most_used' => _x( 'Choose from the most used media', 'media' ),
-        'menu_name' => _x( 'Media', 'media' ),
-    );
-
-    $args = array( 
-        'labels' => $labels,
-        'public' => true,
-        'show_in_nav_menus' => true,
-        'show_ui' => true,
-        'show_tagcloud' => true,
-        'hierarchical' => true,
-
-        'rewrite' => true,
-        'query_var' => true
-    );
-
-    register_taxonomy( 'media', array('portfolio'), $args );
-}
-
-//////////////////////////
-
-add_action( 'init', 'register_taxonomy_service' );
-
-function register_taxonomy_service() {
-
-    $labels = array( 
-        'name' => _x( 'Services', 'service' ),
-        'singular_name' => _x( 'Service', 'service' ),
-        'search_items' => _x( 'Search Services', 'service' ),
-        'popular_items' => _x( 'Popular Services', 'service' ),
-        'all_items' => _x( 'All Services', 'service' ),
-        'parent_item' => _x( 'Parent Service', 'service' ),
-        'parent_item_colon' => _x( 'Parent Service:', 'service' ),
-        'edit_item' => _x( 'Edit Service', 'service' ),
-        'update_item' => _x( 'Update Service', 'service' ),
-        'add_new_item' => _x( 'Add New Service', 'service' ),
-        'new_item_name' => _x( 'New Service Name', 'service' ),
-        'separate_items_with_commas' => _x( 'Separate services with commas', 'service' ),
-        'add_or_remove_items' => _x( 'Add or remove services', 'service' ),
-        'choose_from_most_used' => _x( 'Choose from the most used services', 'service' ),
-        'menu_name' => _x( 'Services', 'service' ),
-    );
-
-    $args = array( 
-        'labels' => $labels,
-        'public' => true,
-        'show_in_nav_menus' => true,
-        'show_ui' => true,
-        'show_tagcloud' => true,
-        'hierarchical' => true,
-
-        'rewrite' => true,
-        'query_var' => true
-    );
-
-    register_taxonomy( 'service', array('portfolio'), $args );
-}
 
 
 // =============================================================================
@@ -185,61 +90,121 @@ if (is_admin()) {
 	));
 }
 */
-	
-// =============================================================================
-
-//////////////////////////
-//
-// ADD IMAGE SIZES
-//
-//////////////////////////
-
-add_image_size( '150x150', 150, 150, true );
-add_image_size( '150x9999', 150, 9999 );
-add_image_size( '150x150', 600, 9999, true );
 
 // =============================================================================
 
 //////////////////////////
 //
-// SHORT CODES
+// ADD META BOX
 //
 //////////////////////////
 
-// create shortcode for listing:
-function bms_portfolio_listing($atts, $content=null) {
-	extract( shortcode_atts( array(
-		'foo' => 'something',
-		'bar' => 'something else',
-	), $atts ) );
-	
-	$return="<ul>"."\r\n";
-	$i = 0;
-	
-	// get posts
-	$args = array('post_type'=>'portfolio', 'orderby'=>'menu_order', 'order'=>'ASC');
-	$my_posts = get_posts($args);
-	foreach($my_posts as $my_post) {
-		$img = get_post_meta($my_post->ID, '_smartmeta_bms_portfolio_image', true);
-		$img = wp_get_attachment_image_src( $img, '150x150');
-		$img_src	=$img[0];
-		$img_width	=$img[1];
-		$img_height	=$img[2];	
-		$img_class	= ($i%2 ==0) ? 'alignleft' : 'alignright';
-		
-		$return .= "<li class='bms-portfolio portfolio-".$my_post->ID."'>"."\r\n";
-		$return .= "<p><strong><a href='". get_permalink($my_post->ID)."'>".$my_post->post_title."</a></strong></p>"."\r\n";
-		$return .= "<img src='$img_src' width='$img_width' height='$img_height' class='$img_class' alt='image' />"."\r\n";
-		// if( current_user_can('edit_posts') ) $return .= "<p><a href=".get_edit_post_link($my_post->ID).">Edit</a>"."\r\n";
-		$return .= "</li>"."\r\n";
-		$i++;
-	}
-	
-	$return.="</ul>"."\r\n";
+function portfolio_bg_imgs( $attachments )
+{
+  $fields         = array(
+    array(
+      'name'      => 'title',                         // unique field name
+      'type'      => 'text',                          // registered field type
+      'label'     => __( 'Title', 'attachments' ),    // label to display
+      // 'default'   => 'title',                         // default value upon selection
+    ),
+  );
 
-	return $return;
+  $args = array(
+
+    // title of the meta box (string)
+    'label'         => 'Background Images',
+
+    // all post types to utilize (string|array)
+    'post_type'     => array( 'portfolio' ),
+
+    // meta box position (string) (normal, side or advanced)
+    'position'      => 'normal',
+
+    // meta box priority (string) (high, default, low, core)
+    'priority'      => 'high',
+
+    // allowed file type(s) (array) (image|video|text|audio|application)
+    'filetype'      => array('image'),  // no filetype limit
+
+    // include a note within the meta box (string)
+    'note'          => 'Attach files here!',
+
+    // by default new Attachments will be appended to the list
+    // but you can have then prepend if you set this to false
+    'append'        => true,
+
+    // text for 'Attach' button in meta box (string)
+    'button_text'   => __( 'Attach Files', 'attachments' ),
+
+    // text for modal 'Attach' button (string)
+    'modal_text'    => __( 'Attach', 'attachments' ),
+
+    // which tab should be the default in the modal (string) (browse|upload)
+    'router'        => 'browse',
+
+    // fields array
+    'fields'        => $fields,
+
+  );
+
+  $attachments->register( 'portfolio_bg_imgs', $args ); // unique instance name
 }
 
-add_shortcode('bms_portfolio_listing', 'bms_portfolio_listing');
+add_action( 'attachments_register', 'portfolio_bg_imgs' );
 
-?>
+// ===============================================================
+
+function portfolio_other_imgs( $attachments )
+{
+  $fields         = array(
+    array(
+      'name'      => 'title',                         // unique field name
+      'type'      => 'text',                          // registered field type
+      'label'     => __( 'Title', 'attachments' ),    // label to display
+      // 'default'   => 'title',                         // default value upon selection
+    ),
+  );
+
+  $args = array(
+
+    // title of the meta box (string)
+    'label'         => 'Other Images',
+
+    // all post types to utilize (string|array)
+    'post_type'     => array( 'portfolio' ),
+
+    // meta box position (string) (normal, side or advanced)
+    'position'      => 'normal',
+
+    // meta box priority (string) (high, default, low, core)
+    'priority'      => 'high',
+
+    // allowed file type(s) (array) (image|video|text|audio|application)
+    'filetype'      => array('image'),  // no filetype limit
+
+    // include a note within the meta box (string)
+    'note'          => 'Attach files here!',
+
+    // by default new Attachments will be appended to the list
+    // but you can have then prepend if you set this to false
+    'append'        => true,
+
+    // text for 'Attach' button in meta box (string)
+    'button_text'   => __( 'Attach Files', 'attachments' ),
+
+    // text for modal 'Attach' button (string)
+    'modal_text'    => __( 'Attach', 'attachments' ),
+
+    // which tab should be the default in the modal (string) (browse|upload)
+    'router'        => 'browse',
+
+    // fields array
+    'fields'        => $fields,
+
+  );
+
+  $attachments->register( 'portfolio_other_imgs', $args ); // unique instance name
+}
+
+add_action( 'attachments_register', 'portfolio_other_imgs' );
