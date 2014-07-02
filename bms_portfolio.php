@@ -7,13 +7,40 @@
 /*
 Plugin Name: BMS Portfolio
 Plugin URI: http://bigmikestudios.com
-Depends: bms_smart_meta_box/bms_smart_meta_box.php
 Description: Adds a 'Portfolio' post type and shortcodes
 Version: 0.0.1
 Author URI: http://bigmikestudios.com
 */
 
 $cr = "\r\n";
+
+// =============================================================================
+
+function bms_pf_check_required_plugin() {
+    if ( class_exists( 'acf' ) || !is_admin() || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
+        return;
+    }
+
+    require_once ABSPATH . '/wp-admin/includes/plugin.php';
+    deactivate_plugins( __FILE__ );
+
+    $msg =  __( 'BMS Portfolio has been deactivated as it requires the <a href="http://www.advancedcustomfields.com/">Advanced Custom Fields</a> plugin.', 'bms_portfolio' ) . '<br /><br />';
+    
+    if ( file_exists( WP_PLUGIN_DIR . '/advanced-custom-fields/acf.php' ) ) {
+        $activate_url = wp_nonce_url( 'plugins.php?action=activate&amp;plugin=advanced-custom-fields/acf.php', 'activate-plugin_advanced-custom-fields/acf.php' );
+        $msg .= sprintf( __( 'It appears to already be installed. <a href="%s">Click here to activate it.</a>', 'bms_portfolio' ), $activate_url );
+    }
+    else {
+        $download_url = 'http://downloads.wordpress.org/plugin/advanced-custom-fields.zip';
+        $msg .= sprintf( __( '<a href="%s">Click here to download a zip of the latest version.</a> Then install and activate it. ', 'bms_portfolio' ), $download_url );
+    }
+
+    $msg .= '<br /><br />' . __( 'Once it has been activated, you can activate BMS Portfolio.', 'bms_portfolio' );
+
+    wp_die( $msg );
+}
+
+add_action( 'plugins_loaded', 'bms_pf_check_required_plugin' );
 
 // =============================================================================
 
@@ -65,146 +92,4 @@ function bms_portfolio_add_post_thumbnails() {
 	add_theme_support( 'post-thumbnails', array( 'portfolio' ) );
 }
 
-
-
-
 // =============================================================================
-
-//////////////////////////
-//
-// ADD META BOX
-//
-//////////////////////////
-/*
-if (is_admin()) {
-	if (!class_exists('SmartMetaBox')) {
-		require_once("../wp-content/plugins/bms_smart_meta_box/SmartMetaBox.php");
-	}
-		
-	new SmartMetaBox('smart_meta_box_portfolio', array(
-		'title'     => 'BMS Portfolio',
-		'pages'     => array('portfolio'),
-		'context'   => 'normal',
-		'priority'  => 'high',
-		'fields'    => $fields
-	));
-}
-*/
-
-// =============================================================================
-
-//////////////////////////
-//
-// ADD META BOX
-//
-//////////////////////////
-
-function portfolio_bg_imgs( $attachments )
-{
-  $fields         = array(
-    array(
-      'name'      => 'title',                         // unique field name
-      'type'      => 'text',                          // registered field type
-      'label'     => __( 'Title', 'attachments' ),    // label to display
-      // 'default'   => 'title',                         // default value upon selection
-    ),
-  );
-
-  $args = array(
-
-    // title of the meta box (string)
-    'label'         => 'Background Images',
-
-    // all post types to utilize (string|array)
-    'post_type'     => array( 'portfolio' ),
-
-    // meta box position (string) (normal, side or advanced)
-    'position'      => 'normal',
-
-    // meta box priority (string) (high, default, low, core)
-    'priority'      => 'high',
-
-    // allowed file type(s) (array) (image|video|text|audio|application)
-    'filetype'      => array('image'),  // no filetype limit
-
-    // include a note within the meta box (string)
-    'note'          => 'Attach files here!',
-
-    // by default new Attachments will be appended to the list
-    // but you can have then prepend if you set this to false
-    'append'        => true,
-
-    // text for 'Attach' button in meta box (string)
-    'button_text'   => __( 'Attach Files', 'attachments' ),
-
-    // text for modal 'Attach' button (string)
-    'modal_text'    => __( 'Attach', 'attachments' ),
-
-    // which tab should be the default in the modal (string) (browse|upload)
-    'router'        => 'browse',
-
-    // fields array
-    'fields'        => $fields,
-
-  );
-
-  $attachments->register( 'portfolio_bg_imgs', $args ); // unique instance name
-}
-
-add_action( 'attachments_register', 'portfolio_bg_imgs' );
-
-// ===============================================================
-
-function portfolio_other_imgs( $attachments )
-{
-  $fields         = array(
-    array(
-      'name'      => 'title',                         // unique field name
-      'type'      => 'text',                          // registered field type
-      'label'     => __( 'Title', 'attachments' ),    // label to display
-      // 'default'   => 'title',                         // default value upon selection
-    ),
-  );
-
-  $args = array(
-
-    // title of the meta box (string)
-    'label'         => 'Other Images',
-
-    // all post types to utilize (string|array)
-    'post_type'     => array( 'portfolio' ),
-
-    // meta box position (string) (normal, side or advanced)
-    'position'      => 'normal',
-
-    // meta box priority (string) (high, default, low, core)
-    'priority'      => 'high',
-
-    // allowed file type(s) (array) (image|video|text|audio|application)
-    'filetype'      => array('image'),  // no filetype limit
-
-    // include a note within the meta box (string)
-    'note'          => 'Attach files here!',
-
-    // by default new Attachments will be appended to the list
-    // but you can have then prepend if you set this to false
-    'append'        => true,
-
-    // text for 'Attach' button in meta box (string)
-    'button_text'   => __( 'Attach Files', 'attachments' ),
-
-    // text for modal 'Attach' button (string)
-    'modal_text'    => __( 'Attach', 'attachments' ),
-
-    // which tab should be the default in the modal (string) (browse|upload)
-    'router'        => 'browse',
-
-    // fields array
-    'fields'        => $fields,
-
-  );
-
-  $attachments->register( 'portfolio_other_imgs', $args ); // unique instance name
-}
-
-add_action( 'attachments_register', 'portfolio_other_imgs' );
